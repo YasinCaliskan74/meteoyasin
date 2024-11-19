@@ -26,28 +26,42 @@ namespace meteoyasin
         public MainWindow()
         {
             InitializeComponent();
+            _:MethodAsync();
         }
 
-        public async Task<string> GetBlogdetails()
+        public async Task<Main> MethodAsync()
         {
             HttpClient client = new HttpClient();
-            HttpResponseMessage response = await client.GetAsync("Votre uri");
-
+            HttpResponseMessage response = await client.GetAsync("https://api.openweathermap.org/data/2.5/weather?q=annecy,fr&appid=c21a75b667d6f7abb81f118dcf8d4611&units=metric");
             if (response.IsSuccessStatusCode)
+
             {
                 var content = await response.Content.ReadAsStringAsync();
-                Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(content);
-                return myDeserializedClass.name;
+                Root root = JsonConvert.DeserializeObject<Root>(content);
+                Main main = root.main;
+                var temperature = root.main.temp;
+                var feelslike = root.main.feels_like;
+                var weatherDescription = root.weather[0].description;
+                var humidity = root.main.humidity;
+                var maxTemperature = root.main.temp_max;
+
+
+                TB_displaytemp.Text = $"{temperature} °C";
+                TB_displayplus_haut.Text = $"{maxTemperature} °C";
+                TB_displayplus_bas.Text = $"{humidity} %";
+                TB_displayressentie.Text = $"{feelslike} °C";
+                TB_displaypression.Text = weatherDescription;
+
+                return main;
             }
             else
             {
                 var tt = "error";
-                return null;
+
             }
+            return null;
         }
-    }
-    // Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse);
-    public class Clouds
+        public class Clouds
     {
         public int all { get; set; }
     }
@@ -109,5 +123,7 @@ namespace meteoyasin
         public double speed { get; set; }
         public int deg { get; set; }
     }
-
+       
+        
+    }
 }
